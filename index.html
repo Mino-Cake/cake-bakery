@@ -22,6 +22,12 @@
     .hero-video{position:relative;overflow:hidden;border-radius:25px;background:#fff;box-shadow:0 18px 50px #4d332014;min-height:260px}
     .hero-video video{display:block;width:100%;height:min(66vw,590px);min-height:280px;object-fit:cover;background:#fff}
     .video-label{position:absolute;left:25px;bottom:22px;padding:9px 14px;border-radius:999px;background:#ffffffdf;color:#493a34;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+    .mute-btn{position:absolute;right:18px;top:18px;z-index:5;width:46px;height:46px;border:0;border-radius:50%;background:#ffffffdf;backdrop-filter:blur(8px);color:#493a34;font-size:20px;display:grid;place-items:center;box-shadow:0 4px 16px #00000026;cursor:pointer;transition:.25s}
+    .mute-btn:hover{background:#fff;transform:scale(1.08)}
+    .mute-btn:focus-visible{outline:2px solid var(--rose);outline-offset:3px}
+    .mute-btn .pulse{position:absolute;inset:0;border-radius:50%;border:2px solid #d98fa4;opacity:0;animation:mutePulse 2.4s ease-out infinite}
+    @keyframes mutePulse{0%{transform:scale(1);opacity:.7}70%{transform:scale(1.5);opacity:0}100%{opacity:0}}
+    .mute-btn.unmuted .pulse{display:none}
     .hero-copy{text-align:center;max-width:700px;margin:36px auto 0}
     .eyebrow{font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--rose);font-weight:750}
     h1,h2,h3,p{margin-top:0} h1{font:clamp(38px,7vw,70px)/1.02 Georgia,serif;letter-spacing:-.04em;margin:12px 0}
@@ -89,12 +95,12 @@
 <main id="home">
   <section class="hero">
     <div class="wrap">
-     <video id="heroVid" autoplay muted loop playsinline preload="auto" poster="cakes-assorted.jpg">
-  <source src="mino-brand-video.mp4" type="video/mp4">
-</video>
-<button id="muteBtn" onclick="toggleMute()" style="position:absolute;right:18px;top:18px;…">🔊</button>
-
+      <div class="hero-video">
+        <video id="heroVid" autoplay muted loop playsinline preload="auto" poster="cakes-assorted.jpg">
+          <source src="mino-brand-video.mp4" type="video/mp4">
+          Browser kamu belum mendukung video.
         </video>
+        <button class="mute-btn" id="muteBtn" type="button" aria-label="Aktifkan suara video" aria-pressed="false" title="Klik untuk menyalakan suara" onclick="toggleMute()"><span class="pulse"></span><span class="icon">🔇</span></button>
         <span class="video-label">A little sweetness, made with love</span>
       </div>
       <div class="hero-copy" id="about">
@@ -249,6 +255,27 @@
   document.getElementById("salesForm").addEventListener("submit",e=>{e.preventDefault();const d=getSales();d.unshift({id:Date.now(),date:new Date().toISOString(),name:document.getElementById("saleProduct").value,amount:Number(document.getElementById("saleAmount").value),status:document.getElementById("saleStatus").value});saveSales(d);e.target.reset();renderDashboard()});
   document.getElementById("adminModal").addEventListener("click",e=>{if(e.target.id==="adminModal")closeAdmin()});
   document.getElementById("year").textContent=new Date().getFullYear();
+  function toggleMute(){
+    const v=document.getElementById('heroVid');
+    const btn=document.getElementById('muteBtn');
+    const icon=btn.querySelector('.icon');
+    v.muted=!v.muted;
+    if(v.muted){
+      icon.textContent='🔇';
+      btn.classList.remove('unmuted');
+      btn.setAttribute('aria-label','Aktifkan suara video');
+      btn.setAttribute('aria-pressed','false');
+      btn.title='Klik untuk menyalakan suara';
+      try{v.pause();v.play().catch(()=>{})}catch(e){}
+    }else{
+      icon.textContent='🔊';
+      btn.classList.add('unmuted');
+      btn.setAttribute('aria-label','Matikan suara video');
+      btn.setAttribute('aria-pressed','true');
+      btn.title='Klik untuk mematikan suara';
+      v.play().catch(()=>{});
+    }
+  }
 </script>
 </body>
 </html>
